@@ -1,0 +1,223 @@
+basePath: /api/v1
+definitions:
+  handlers.Item:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Молоко
+        type: string
+      price:
+        example: 120
+        type: integer
+    type: object
+  handlers.LoginRequest:
+    properties:
+      login:
+        example: admin
+        type: string
+      password:
+        example: admin123
+        type: string
+    type: object
+  handlers.LoginResponse:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIs...
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Сервер управления данными с JWT-авторизацией
+  title: Items API
+  version: "1.0"
+paths:
+  /items:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.Item'
+            type: array
+      summary: Список элементов
+      tags:
+      - items
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Новый элемент
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.Item'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.Item'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Создать элемент
+      tags:
+      - items
+  /items/{id}:
+    delete:
+      parameters:
+      - description: ID элемента
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Удалить элемент
+      tags:
+      - items
+    get:
+      parameters:
+      - description: ID элемента
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Item'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить элемент по ID
+      tags:
+      - items
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID элемента
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новые данные
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.Item'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Item'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Обновить элемент
+      tags:
+      - items
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Проверяет login/password из .env и возвращает JWT
+      parameters:
+      - description: Учётные данные
+        in: body
+        name: creds
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Авторизация
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    description: 'Введите токен в формате: Bearer <JWT>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
